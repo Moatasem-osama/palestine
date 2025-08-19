@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الصحفيين في غزة</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<!-- خط Cairo -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    background-color: #121212;
+    font-family: 'Cairo', sans-serif;
+    color: #fff;
+  }
+
+  span, h1 {
+    font-size: large;
+    color: #ff0000;
+    display: block;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: #f1f1f1;
+  }
+
+  .card {
+    background: linear-gradient(135deg, #1c1c1c, #2a2a2a);
+    border-radius: 15px;
+    border-left: 5px solid #ff0000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    padding: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 100%;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+  }
+
+  .spinner-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(18,18,18,0.7);
+    z-index: 9999;
+  }
+</style>
+<link rel="stylesheet" href="../nav.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg p-0 navbar-dark sticky-top">
+  <div class="container">
+
+    <a class="navbar-brand" href="#"> <img src="../logo-removebg-preview.png" width="200" alt=""></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto column-gap-5 justify-content-between">
+        <li class="nav-item"><a class="nav-link" href="../index.html#hero">الرئيسية</a></li>
+        <li class="nav-item"><a class="nav-link" href="../index.html#about">عن الموقع</a></li>
+        <li class="nav-item"><a class="nav-link" href="../casualties_daily_gaza/index.html">غزة</a></li>
+        <li class="nav-item"><a class="nav-link" href="../west_bank_daily/index.html">الضفة الغربية</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">الصحفيين</a></li>
+        <li class="nav-item"><a class="nav-link" href="../summary/index.html">ملخص</a></li>
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="spinner-container d-none">
+  <div class="spinner-border text-danger" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div class="container my-5">
+  <div class="row gy-4" id="demo">
+  </div>
+</div>
+
+<script>
+  const spinnerContainer = document.querySelector('.spinner-container');
+
+  async function killedPress() {
+    spinnerContainer.classList.remove('d-none');
+
+    let response = await fetch('https://data.techforpalestine.org/api/v2/press_killed_in_gaza.min.json');
+    let data = await response.json();
+
+    displayData(data);
+    spinnerContainer.classList.add('d-none');
+  }
+
+  function displayData(data) {
+    const demo = document.getElementById('demo');
+    demo.innerHTML = ''; 
+
+    data.forEach(item => {
+      demo.innerHTML += `
+        <div class="col-lg-4 col-md-6">
+          <div class="card">
+            <h1>
+              <span>${item.name}</span>
+              <span>${item.name_en}</span>
+            </h1>
+            <p>${item.notes ?? ''}</p>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  killedPress();
+</script>
+</body>
+</html>

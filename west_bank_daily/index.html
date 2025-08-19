@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إحصائيات يومية في الضفة الغربية</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+  />
+  <!-- خط Cairo -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #121212;
+      font-family: 'Cairo', sans-serif;
+      color: #fff;
+    }
+
+    h2 {
+      color: #ff0000;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    #dateSelect {
+      max-width: 300px;
+      margin: 0 auto 20px auto;
+    }
+
+    #dataDisplay {
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .card {
+      background: linear-gradient(to bottom right, #1c1c1c, #2a2a2a);
+      border-radius: 15px;
+      border-left: 6px solid #ff0000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      transition: transform 0.2s, box-shadow 0.3s;
+      color: #fff;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+    }
+
+    .card h4 {
+      color: #ff0000;
+      margin-bottom: 1rem;
+    }
+
+    .card p {
+      margin: 0.25rem 0;
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+
+    .highlight-killed {
+      background-color: #ff4c4c;
+      color: #fff;
+    }
+
+    .highlight-injured {
+      background-color: #4c9fff;
+      color: #fff;
+    }
+
+    .highlight-children {
+      background-color: #4cff85;
+      color: #000;
+    }
+
+    .highlight-women {
+      background-color: #ff85c1;
+      color: #000;
+    }
+
+    .highlight-medical {
+      background-color: #fff075;
+      color: #000;
+    }
+
+    .highlight-press {
+      background-color: #c0c0c0;
+      color: #000;
+    }
+
+  </style>
+  <link rel="stylesheet" href="../nav.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg p-0 navbar-dark sticky-top">
+  <div class="container">
+
+    <a class="navbar-brand" href="#"> <img src="../logo-removebg-preview.png" width="200" alt=""></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto column-gap-5 justify-content-between">
+       <li class="nav-item"><a class="nav-link" href="../index.html#hero">الرئيسية</a></li>
+        <li class="nav-item"><a class="nav-link" href="../index.html#about">عن الموقع</a></li>
+        <li class="nav-item"><a class="nav-link" href="../casualties_daily_gaza/index.html">غزة</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">الضفة الغربية</a></li>
+        <li class="nav-item"><a class="nav-link" href="../press_killed_in_gaza/index.html">الصحفيين</a></li>
+        <li class="nav-item"><a class="nav-link" href="../summary/index.html">ملخص</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+  <div class="container my-4">
+    <h2>اختر التاريخ لعرض البيانات:</h2>
+    <select id="dateSelect" class="form-select mb-3">
+      <option value="">اختر تاريخ</option>
+    </select>
+
+    <div id="dataDisplay"></div>
+  </div>
+
+<script>
+let allData =[];
+const select = document.getElementById('dateSelect');
+
+async function fetchData() {
+  let response = await fetch('https://data.techforpalestine.org/api/v2/west_bank_daily.min.json');
+  let result = await response.json();
+  allData = result;
+  popularSelect(result);
+}
+
+function popularSelect(result) {
+  result.forEach(entry => {
+    const option = document.createElement('option');
+    option.value = entry.report_date;
+    option.textContent = entry.report_date;
+    select.appendChild(option);
+  });
+}
+
+select.addEventListener('change', function () {
+  const selectedData = this.value;
+  const entry = allData.find(item => item.report_date === selectedData);
+  displayData(entry);
+});
+
+function displayData(entry) {
+  const div = document.getElementById('dataDisplay');
+  if (!entry) {
+    div.innerHTML=``;
+    return;
+  }
+
+  const verified = entry.verified || {};
+
+  div.innerHTML = `
+  <div class="card p-3 shadow-sm mb-3">
+    <h4>تاريخ: ${entry.report_date}</h4>
+    <p class="highlight-killed">الشهداء اليوم: ${verified.killed ?? 'غير معروف'}</p>
+    <p class="highlight-injured">المصابين اليوم: ${verified.injured ?? 'غير معروف'}</p>
+    <p class="highlight-children">الشهداء الأطفال اليوم: ${verified.killed_children ?? 'غير معروف'}</p>
+    <p class="highlight-children">المصابين الأطفال اليوم: ${verified.injured_children ?? 'غير معروف'}</p>
+    <p>الشهداء التراكمي: ${verified.killed_cum ?? entry.killed_cum ?? 'غير معروف'}</p>
+    <p>المصابين التراكمي: ${verified.injured_cum ?? entry.injured_cum ?? 'غير معروف'}</p>
+    <p>الشهداء الأطفال التراكمي: ${verified.killed_children_cum ?? entry.killed_children_cum ?? 'غير معروف'}</p>
+    <p>المصابين الأطفال التراكمي: ${verified.injured_children_cum ?? entry.injured_children_cum ?? 'غير معروف'}</p>
+  </div>`;
+}
+
+fetchData();
+</script>
+</body>
+</html>

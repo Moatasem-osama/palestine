@@ -1,0 +1,12 @@
+  .navbar {
+      background-color: rgba(0,0,0,0.85);
+      backdrop-filter: blur(10px);
+    }
+    .navbar .nav-link {
+      color: #fff;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .navbar .nav-link:hover {
+      color: #ff0000;
+    }
